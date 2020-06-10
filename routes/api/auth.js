@@ -26,7 +26,7 @@ router.get('/', auth, async (req, res) => {
     res.json(user)
   } catch (error) {
     console.error(error.message)
-    res.status(500).send('Auth middlewware is not functioning properly')
+    res.status(500).json({ status: '500 Internal Server Errror', msg: 'Authentication task failed successfully' })
   }
 })
 
@@ -52,10 +52,10 @@ const authenticateUser = async (req, res) => {
 
   try {
     // find the user
-    let user = await User.findOne({ email })
+    const user = await User.findOne({ email })
 
     if (!user) {
-      return res.status(422).json({ errors: [{ msg: 'Invalid credentials' }] })
+      return res.status(422).json({ errors: [{ status: '422 Unprocessable Entity', msg: 'Invalid credentials' }] })
     }
 
     // match email (user's identifier) w/password saved in db
@@ -64,7 +64,7 @@ const authenticateUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password)
 
     if (!isMatch) {
-      return res.status(422).json({ errors: [{ msg: 'Invalid credentials' }] })
+      return res.status(422).json({ errors: [{ status: '422 Unprocessable Entity', msg: 'Invalid credentials' }] })
     }
 
     // return jwt/w user id to identify and auto-login after registration
@@ -84,7 +84,7 @@ const authenticateUser = async (req, res) => {
     jwt.sign(payload, jwtToken, options, jwtCallback)
   } catch (error) {
     console.error(error.message)
-    res.status(500).send('user registration server error')
+    res.status(500).json({ status: '500 Internal Server Errror', msg: 'User registration task failed successfully' })
   }
 }
 
